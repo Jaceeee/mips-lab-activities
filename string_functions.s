@@ -17,7 +17,7 @@ ARRAY_SIZE:
 FIBONACCI_ARRAY:
 	.word	1, 1, 2, 3, 5, 8, 13, 21, 34, 55
 STR_str:
-	.asciiz "Hunden, Katten, Glassen"
+	.asciiz "a nut for a jar of tuna"
 
 	.globl DBG
 	.text
@@ -196,24 +196,34 @@ reverse_string:
 	sw $ra, 0($sp)	
 
 	jal string_length
+	#call procedure for string length
 	
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
 
 	addi $t2, $a0, 0
-	add $t3, $a0, $v0
+	#$t2 will get pos 0
+	add $t3, $a0, $v0	
     addi $t3, $t3, -1
+    #$t3 will get pos at length-1
 	
 	addi $t5, $zero, 2	
 	div $v0, $v0, $t5
+	# divide v0 by 2 to get the midpoint of string
 	addi $t7, $zero, 0
+	#set comparison string
 	mfhi $t6
+	#get remainder from lo to $t6
 	beq $t6, $t7, proceed
+	#compare if the remainder of division is 0, meaning even
+	#jump to pre-loop if even
 	addi $v0, $v0, 1
+	#else move the midpoint to the right of the quotient
 
 	proceed:
 
     addi $t5, $zero, 0
+    # set left hand counter to 0
     
     reverse_string_loop:
     	beq $v0, $t5, exit_from_reverse_string
