@@ -13,11 +13,11 @@
 	.data
 	
 ARRAY_SIZE:
-	.word	10	# Change here to try other values (less than 10)
+	.word	0	# Change here to try other values (less than 10)
 FIBONACCI_ARRAY:
 	.word	1, 1, 2, 3, 5, 8, 13, 21, 34, 55
 STR_str:
-	.asciiz "a nut for a jar of tuna"
+	.asciiz "Hunden, Katten, Glassen"
 
 	.globl DBG
 	.text
@@ -39,7 +39,7 @@ integer_array_sum:
 DBG:	##### DEBUGG BREAKPOINT ######
 
         addi    $v0, $zero, 0           # Initialize Sum to zero.
-	add	$t0, $zero, $zero	# Initialize array index i to zero.
+	add	$s0, $zero, $zero	# Initialize array index i to zero.
 	
 for_all_in_array:
 
@@ -47,17 +47,17 @@ for_all_in_array:
 	
 	   #a0 has the first memory index
 	   #a1 has the size of the array
-	beq $t0, $a1, end_for_all
+	beq $s0, $a1, end_for_all
 	# Done if i == N
-	sll $t1, $t0, 2
+	sll $s1, $s0, 2
 	# 4*i
-	add $t2, $a0, $t1
+	add $s2, $a0, $s1
 	# address = ARRAY + 4*i
-	lw $t3, 0($t2)
+	lw $s3, 0($s2)
 	# n = A[i]
-		add $v0, $v0, $t3
+		add $v0, $v0, $s3
        	# Sum = Sum + n
-       	addi $t0, $t0, 1
+       	addi $s0, $s0, 1
         # i++ 
     j for_all_in_array       
   	# next element
@@ -83,19 +83,19 @@ string_length:
 
 	addi $v0, $zero, 0
 	# set counter register 	
-	lb $t0, 0($a0)
+	lb $s0, 0($a0)
 	#loads first character into $t0
-	add $t1, $zero, 0
+	add $s1, $zero, 0
 	#sets $t1 as comparison string (as NULL)
 
 character_check:
-	beq $t0, $t1, string_length_end
+	beq $s0, $s1, string_length_end
 	#check if character loaded is a null terminator	
 	addi $v0, $v0, 1
-	# adding of 1 to length
-	add $t2, $v0, $a0
+	# adding of 1 to cumulative length
+	add $s2, $v0, $a0
 	# set $t2 to be at the offset of the next character
-	lb $t0, 0($t2)
+	lb $s0, 0($s2)
 	# loads character at current position, $v0	
 	j character_check
 
@@ -122,29 +122,29 @@ string_for_each:
 	sw	$ra, 0($sp)
 
 	#### Write your solution here ####	
-	addi $t1, $zero, 0
+	addi $s1, $zero, 0
 	#sets the NULL comparison
-	lb $t0, 0($a0)
+	lb $s0, 0($a0)
 	#sets $t0 as the first character of string at $a0	
 
 	string_for_each_innerloop:
-		beq $t0, $t1, return_string
+		beq $s0, $s1, return_string
 		# if null string is seen at $t0, jump to return_string
 		addi $sp, $sp, -12
-		sw $t0, 0($sp)
-		sw $t1, 4($sp)
+		sw $s0, 0($sp)
+		sw $s1, 4($sp)
 		sw $a0, 8($sp)		
 		jal $a1
 		# calls function
 
-		lw $t0, 0($sp)
-		lw $t1, 4($sp)
+		lw $s0, 0($sp)
+		lw $s1, 4($sp)
 		lw $a0, 8($sp)
 		addi $sp, $sp, 12
 
 		addi $a0, $a0, 1
 		# moves the $a0 address by an offset of 1
-		lb $t0, 0($a0)		
+		lb $s0, 0($a0)		
 		# sets the $t0 to the current address of $a0
 		j string_for_each_innerloop
 
@@ -165,21 +165,21 @@ string_for_each:
 to_upper:
 
 	#### Write your solution here ####    
-	lb $t2, 0($a0)
-    addi $t1, $zero, 0	
+	lb $s2, 0($a0)
+    addi $s1, $zero, 0	
 
-    slti $t0, $t2, 97
-    bne $t0, $t1, exit_from_to_upper
+    slti $s0, $s2, 97
+    bne $s0, $s1, exit_from_to_upper
 
     start_inner_check:
-	slti $t0, $t2, 123
+	slti $s0, $s2, 123
 
-	bne $t0, $t1, change_char
+	bne $s0, $s1, change_char
 	j exit_from_to_upper
 
     change_char:
-    	addi $t2, $t2, -32
-    	sb $t2, 0($a0)
+    	addi $s2, $s2, -32
+    	sb $s2, 0($a0)
 
     exit_from_to_upper:
 	jr	$ra
@@ -196,44 +196,34 @@ reverse_string:
 	sw $ra, 0($sp)	
 
 	jal string_length
-	#call procedure for string length
 	
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
 
-	addi $t2, $a0, 0
-	#$t2 will get pos 0
-	add $t3, $a0, $v0	
-    addi $t3, $t3, -1
-    #$t3 will get pos at length-1
+	addi $s2, $a0, 0
+	add $s3, $a0, $v0
+    addi $s3, $s3, -1
 	
-	addi $t5, $zero, 2	
-	div $v0, $v0, $t5
-	# divide v0 by 2 to get the midpoint of string
-	addi $t7, $zero, 0
-	#set comparison string
-	mfhi $t6
-	#get remainder from lo to $t6
-	beq $t6, $t7, proceed
-	#compare if the remainder of division is 0, meaning even
-	#jump to pre-loop if even
+	addi $s5, $zero, 2	
+	div $v0, $v0, $s5
+	addi $s7, $zero, 0
+	mfhi $s6
+	beq $s6, $s7, proceed
 	addi $v0, $v0, 1
-	#else move the midpoint to the right of the quotient
 
 	proceed:
 
-    addi $t5, $zero, 0
-    # set left hand counter to 0
+    addi $s5, $zero, 0
     
     reverse_string_loop:
-    	beq $v0, $t5, exit_from_reverse_string
-    	addi $t5, $t5, 1
-    	lb $t0, 0($t2)
-    	lb $t1, 0($t3)
-    	sb $t0, 0($t3)
-    	sb $t1, 0($t2)
-    	addi $t2, $t2, 1
-    	addi $t3, $t3, -1
+    	beq $v0, $s5, exit_from_reverse_string
+    	addi $s5, $s5, 1
+    	lb $s0, 0($s2)
+    	lb $s1, 0($s3)
+    	sb $s0, 0($s3)
+    	sb $s1, 0($s2)
+    	addi $s2, $s2, 1
+    	addi $s3, $s3, -1
     	j reverse_string_loop
 
     exit_from_reverse_string:
