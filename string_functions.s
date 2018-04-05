@@ -166,20 +166,30 @@ to_upper:
 
 	#### Write your solution here ####    
 	lb $s2, 0($a0)
+	#loads the character at address $a0 to $s2
     addi $s1, $zero, 0	
+    #sets $s1 as a comparison register
 
     slti $s0, $s2, 97
+    #if the ascii value is less than 97, $s0 is set to one
     bne $s0, $s1, exit_from_to_upper
+    # meaning if it is less than 97, it's pointless to subtract, and should just return from procedure directly
 
     start_inner_check:
 	slti $s0, $s2, 123
+	# at this point, we are sure ascii value should be at least 97. but we set $s0 to 1 if we are sure it is also less than 123
+	# (a-z is 97-122) meaning it is a lowercase char
 
 	bne $s0, $s1, change_char
+	# if it is 1, we should change the char
 	j exit_from_to_upper
+	# else exit from procedure
 
     change_char:
     	addi $s2, $s2, -32
+    	# simply subtract 32 from the lowercase char ascii value 
     	sb $s2, 0($a0)
+    	# and we store that new value back into the position marked by address $a0
 
     exit_from_to_upper:
 	jr	$ra
