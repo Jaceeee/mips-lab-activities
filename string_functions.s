@@ -122,29 +122,27 @@ string_for_each:
 	sw	$ra, 0($sp)
 
 	#### Write your solution here ####	
-	addi $s1, $zero, 0
+	addi $t1, $zero, 0
 	#sets the NULL comparison
-	lb $s0, 0($a0)
-	#sets $t0 as the first character of string at $a0	
-
+	
 	string_for_each_innerloop:
-		beq $s0, $s1, return_string
+		lb $t0, 0($a0)
+		#sets $t0 as the first character of string at $a0	
+		beq $t0, $t1, return_string
 		# if null string is seen at $t0, jump to return_string
 		addi $sp, $sp, -12
-		sw $s0, 0($sp)
-		sw $s1, 4($sp)
+		sw $t0, 0($sp)
+		sw $t1, 4($sp)
 		sw $a0, 8($sp)		
 		jal $a1
 		# calls function
 
-		lw $s0, 0($sp)
-		lw $s1, 4($sp)
+		lw $t0, 0($sp)
+		lw $t1, 4($sp)
 		lw $a0, 8($sp)
 		addi $sp, $sp, 12
 
-		addi $a0, $a0, 1
-		# moves the $a0 address by an offset of 1
-		lb $s0, 0($a0)		
+		addi $a0, $a0, 1		
 		# sets the $t0 to the current address of $a0
 		j string_for_each_innerloop
 
